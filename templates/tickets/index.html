@@ -1,0 +1,167 @@
+{% extends "tickets/base.html" %}
+
+{% block content %}
+<div class="py-6">
+  <!-- Header -->
+  <div class="px-4 sm:px-6 md:px-0 mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Tickets Support</h1>
+        <p class="mt-2 text-sm text-gray-600">Gérez les demandes d'assistance des établissements</p>
+      </div>
+      <a href="{{ url_for('tickets.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Nouveau Ticket
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-4 mb-8 px-4 sm:px-6 md:px-0" id="stats-container">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Tickets</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-gray-900" id="stat-total">-</dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Ouverts</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-red-600" id="stat-ouverts">-</dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">En Cours</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-blue-600" id="stat-en-cours">-</dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Résolus</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-green-600" id="stat-resolus">-</dd>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="px-4 sm:px-6 md:px-0 mb-6 bg-white rounded-lg shadow p-4">
+    <form method="GET" class="space-y-4 md:space-y-0 md:grid md:grid-cols-5 md:gap-4">
+      <div>
+        <label for="search" class="block text-sm font-medium text-gray-700">Rechercher</label>
+        <input type="text" name="search" id="search" value="{{ search }}" placeholder="Titre, description..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+      </div>
+      <div>
+        <label for="statut" class="block text-sm font-medium text-gray-700">Statut</label>
+        <select name="statut" id="statut" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+          <option value="">Tous</option>
+          <option value="OUVERT" {% if statut == 'OUVERT' %}selected{% endif %}>Ouverts</option>
+          <option value="EN_COURS" {% if statut == 'EN_COURS' %}selected{% endif %}>En Cours</option>
+          <option value="RESOLU" {% if statut == 'RESOLU' %}selected{% endif %}>Résolus</option>
+        </select>
+      </div>
+      <div>
+        <label for="priorite" class="block text-sm font-medium text-gray-700">Priorité</label>
+        <select name="priorite" id="priorite" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+          <option value="">Tous</option>
+          <option value="URGENTE" {% if priorite == 'URGENTE' %}selected{% endif %}>Urgente</option>
+          <option value="HAUTE" {% if priorite == 'HAUTE' %}selected{% endif %}>Haute</option>
+          <option value="NORMALE" {% if priorite == 'NORMALE' %}selected{% endif %}>Normale</option>
+          <option value="BASSE" {% if priorite == 'BASSE' %}selected{% endif %}>Basse</option>
+        </select>
+      </div>
+      <div>
+        <label for="categorie" class="block text-sm font-medium text-gray-700">Catégorie</label>
+        <select name="categorie" id="categorie" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+          <option value="">Tous</option>
+          <option value="BUG" {% if categorie == 'BUG' %}selected{% endif %}>Bug</option>
+          <option value="FEATURE" {% if categorie == 'FEATURE' %}selected{% endif %}>Demande Fonctionnalité</option>
+          <option value="QUESTION" {% if categorie == 'QUESTION' %}selected{% endif %}>Question</option>
+          <option value="AUTRE" {% if categorie == 'AUTRE' %}selected{% endif %}>Autre</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full justify-center">
+          Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="px-4 sm:px-6 md:px-0 bg-white shadow rounded-lg overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Établissement</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priorité</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Création</th>
+          <th scope="col" class="relative px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for ticket in tickets %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">#{{ ticket.id }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ ticket.titre[:30] }}{% if ticket.titre|length > 30 %}...{% endif %}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ticket.etablissement.nom if ticket.etablissement else '-' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if ticket.priorite == 'URGENTE' %}bg-red-100 text-red-800{% elif ticket.priorite == 'HAUTE' %}bg-orange-100 text-orange-800{% elif ticket.priorite == 'NORMALE' %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+              {{ ticket.priorite }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if ticket.statut == 'OUVERT' %}bg-red-100 text-red-800{% elif ticket.statut == 'EN_COURS' %}bg-blue-100 text-blue-800{% elif ticket.statut == 'RESOLU' %}bg-green-100 text-green-800{% endif %}">
+              {{ ticket.statut }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ticket.date_creation.strftime('%d/%m/%Y') }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <a href="{{ url_for('tickets.view', id=ticket.id) }}" class="text-blue-600 hover:text-blue-900 mr-4">Voir</a>
+            <a href="{{ url_for('tickets.edit', id=ticket.id) }}" class="text-green-600 hover:text-green-900 mr-4">Modifier</a>
+            <form method="POST" action="{{ url_for('tickets.delete', id=ticket.id) }}" class="inline" onsubmit="return confirm('Êtes-vous sûr?');">
+              <button type="submit" class="text-red-600 hover:text-red-900">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Aucun ticket trouvé</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if pagination.pages > 1 %}
+  <div class="px-4 sm:px-6 md:px-0 mt-6 flex items-center justify-between">
+    <div class="flex-1 flex justify-between sm:hidden">
+      {% if pagination.has_prev %}
+      <a href="?page={{ pagination.prev_num }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Précédent</a>
+      {% endif %}
+      {% if pagination.has_next %}
+      <a href="?page={{ pagination.next_num }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Suivant</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+// Charger les statistiques
+fetch('{{ url_for("tickets.stats") }}')
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('stat-total').textContent = data.total;
+    document.getElementById('stat-ouverts').textContent = data.ouverts;
+    document.getElementById('stat-en-cours').textContent = data.en_cours;
+    document.getElementById('stat-resolus').textContent = data.resolus;
+  });
+</script>
+{% endblock %}
