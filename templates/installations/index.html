@@ -1,0 +1,150 @@
+{% extends "installations/base.html" %}
+
+{% block content %}
+<div class="py-6">
+  <!-- Header -->
+  <div class="px-4 sm:px-6 md:px-0 mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Installations</h1>
+        <p class="mt-2 text-sm text-gray-600">Gérez les installations système dans les établissements</p>
+      </div>
+      <a href="{{ url_for('installations.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Nouvelle Installation
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-4 mb-8 px-4 sm:px-6 md:px-0" id="stats-container">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Installations</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-gray-900" id="stat-total">-</dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">En Attente</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-yellow-600" id="stat-attente">-</dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">En Cours</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-blue-600" id="stat-cours">-</dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Terminées</dt>
+        <dd class="mt-1 text-3xl font-extrabold text-green-600" id="stat-terminees">-</dd>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="px-4 sm:px-6 md:px-0 mb-6 bg-white rounded-lg shadow p-4">
+    <form method="GET" class="space-y-4 md:space-y-0 md:grid md:grid-cols-4 md:gap-4">
+      <div>
+        <label for="search" class="block text-sm font-medium text-gray-700">Rechercher</label>
+        <input type="text" name="search" id="search" value="{{ search }}" placeholder="Établissement..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+      </div>
+      <div>
+        <label for="statut" class="block text-sm font-medium text-gray-700">Statut</label>
+        <select name="statut" id="statut" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+          <option value="">Tous</option>
+          <option value="EN_ATTENTE" {% if statut == 'EN_ATTENTE' %}selected{% endif %}>En Attente</option>
+          <option value="EN_COURS" {% if statut == 'EN_COURS' %}selected{% endif %}>En Cours</option>
+          <option value="TERMINEES" {% if statut == 'TERMINEES' %}selected{% endif %}>Terminées</option>
+        </select>
+      </div>
+      <div>
+        <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+        <select name="type" id="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+          <option value="">Tous</option>
+          <option value="INITIALE" {% if type_installation == 'INITIALE' %}selected{% endif %}>Installation Initiale</option>
+          <option value="MAINTENANCE" {% if type_installation == 'MAINTENANCE' %}selected{% endif %}>Maintenance</option>
+          <option value="UPGRADE" {% if type_installation == 'UPGRADE' %}selected{% endif %}>Upgrade</option>
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full justify-center">
+          Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table -->
+  <div class="px-4 sm:px-6 md:px-0 bg-white shadow rounded-lg overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Établissement</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technicien</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+          <th scope="col" class="relative px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for inst in installations %}
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ inst.etablissement.nom if inst.etablissement else '-' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ inst.type_installation }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ inst.technicien.nom if inst.technicien else '-' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if inst.statut == 'EN_ATTENTE' %}bg-yellow-100 text-yellow-800{% elif inst.statut == 'EN_COURS' %}bg-blue-100 text-blue-800{% elif inst.statut == 'TERMINEES' %}bg-green-100 text-green-800{% endif %}">
+              {{ inst.statut }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ inst.date_installation.strftime('%d/%m/%Y') if inst.date_installation else '-' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <a href="{{ url_for('installations.view', id=inst.id) }}" class="text-blue-600 hover:text-blue-900 mr-4">Voir</a>
+            <a href="{{ url_for('installations.edit', id=inst.id) }}" class="text-green-600 hover:text-green-900 mr-4">Modifier</a>
+            <form method="POST" action="{{ url_for('installations.delete', id=inst.id) }}" class="inline" onsubmit="return confirm('Êtes-vous sûr?');">
+              <button type="submit" class="text-red-600 hover:text-red-900">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">Aucune installation trouvée</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if pagination.pages > 1 %}
+  <div class="px-4 sm:px-6 md:px-0 mt-6 flex items-center justify-between">
+    <div class="flex-1 flex justify-between sm:hidden">
+      {% if pagination.has_prev %}
+      <a href="?page={{ pagination.prev_num }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Précédent</a>
+      {% endif %}
+      {% if pagination.has_next %}
+      <a href="?page={{ pagination.next_num }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Suivant</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+// Charger les statistiques
+fetch('{{ url_for("installations.stats") }}')
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('stat-total').textContent = data.total;
+    document.getElementById('stat-attente').textContent = data.en_attente;
+    document.getElementById('stat-cours').textContent = data.en_cours;
+    document.getElementById('stat-terminees').textContent = data.terminees;
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "installations/base.html" %}
+
+{% block breadcrumb_extra %}
+<li>
+  <div class="flex items-center">
+    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L12.586 8 7.293 2.707a1 1 0 011.414-1.414l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+    </svg>
+    <span class="ml-4 text-sm font-medium text-gray-500">Nouvelle Installation</span>
+  </div>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="py-6">
+  <div class="px-4 sm:px-6 md:px-0">
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-4 py-5 sm:p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-6">Planifier une nouvelle installation</h2>
+        
+        <form method="POST" class="space-y-6">
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <!-- Établissement -->
+            <div>
+              <label for="etablissement_id" class="block text-sm font-medium text-gray-700">Établissement *</label>
+              <select name="etablissement_id" id="etablissement_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+                <option value="">-- Sélectionner --</option>
+                {% for etab in etablissements %}
+                <option value="{{ etab.id }}">{{ etab.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Type d'installation -->
+            <div>
+              <label for="type_installation" class="block text-sm font-medium text-gray-700">Type d'installation *</label>
+              <select name="type_installation" id="type_installation" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+                <option value="">-- Sélectionner --</option>
+                <option value="INITIALE">Installation Initiale</option>
+                <option value="MAINTENANCE">Maintenance</option>
+                <option value="UPGRADE">Upgrade</option>
+              </select>
+            </div>
+
+            <!-- Technicien -->
+            <div>
+              <label for="technicien_id" class="block text-sm font-medium text-gray-700">Technicien</label>
+              <select name="technicien_id" id="technicien_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+                <option value="">-- Sélectionner --</option>
+                {% for tech in techniciens %}
+                <option value="{{ tech.id }}">{{ tech.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Statut -->
+            <div>
+              <label for="statut" class="block text-sm font-medium text-gray-700">Statut initial</label>
+              <select name="statut" id="statut" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+                <option value="EN_ATTENTE" selected>En Attente</option>
+                <option value="EN_COURS">En Cours</option>
+                <option value="TERMINEES">Terminée</option>
+              </select>
+            </div>
+
+            <!-- Date installation -->
+            <div class="sm:col-span-2">
+              <label for="date_installation" class="block text-sm font-medium text-gray-700">Date et heure d'installation</label>
+              <input type="datetime-local" name="date_installation" id="date_installation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2">
+            </div>
+          </div>
+
+          <!-- Commentaire -->
+          <div>
+            <label for="commentaire" class="block text-sm font-medium text-gray-700">Commentaire</label>
+            <textarea name="commentaire" id="commentaire" rows="4" placeholder="Détails supplémentaires sur l'installation..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border px-3 py-2"></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-end space-x-4">
+            <a href="{{ url_for('installations.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Annuler</a>
+            <button type="submit" class="px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Créer l'installation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "installations/base.html" %}
+
+{% block breadcrumb_extra %}
+<li>
+  <div class="flex items-center">
+    <svg class="flex-shrink-0 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L12.586 8 7.293 2.707a1 1 0 011.414-1.414l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+    </svg>
+    <span class="ml-4 text-sm font-medium text-gray-500">Installation #{{ installation.id }}</span>
+  </div>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="py-6">
+  <div class="px-4 sm:px-6 md:px-0">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Installation #{{ installation.id }}</h1>
+        <p class="mt-2 text-sm text-gray-600">{{ installation.etablissement.nom if installation.etablissement else 'Installation' }}</p>
+      </div>
+      <div class="flex space-x-3">
+        <a href="{{ url_for('installations.edit', id=installation.id) }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700">
+          <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+          Modifier
+        </a>
+        <form method="POST" action="{{ url_for('installations.delete', id=installation.id) }}" class="inline" onsubmit="return confirm('Êtes-vous sûr?');">
+          <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-red-600 hover:bg-red-700">
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mb-6">
+      <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {% if installation.statut == 'EN_ATTENTE' %}bg-yellow-100 text-yellow-800{% elif installation.statut == 'EN_COURS' %}bg-blue-100 text-blue-800{% elif installation.statut == 'TERMINEES' %}bg-green-100 text-green-800{% endif %}">
+        {{ installation.statut }}
+      </span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- Left Column -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Informations Générales -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-4 py-5 sm:p-6 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Détails d'Installation</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Établissement</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  {% if installation.etablissement %}
+                  <a href="{{ url_for('etablissements.view', id=installation.etablissement.id) }}" class="text-blue-600 hover:text-blue-900">{{ installation.etablissement.nom }}</a>
+                  {% else %}
+                  -
+                  {% endif %}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Type d'installation</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ installation.type_installation|default('-') }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Statut</dt>
+                <dd class="mt-1">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if installation.statut == 'EN_ATTENTE' %}bg-yellow-100 text-yellow-800{% elif installation.statut == 'EN_COURS' %}bg-blue-100 text-blue-800{% elif installation.statut == 'TERMINEES' %}bg-green-100 text-green-800{% endif %}">
+                    {{ installation.statut }}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Technicien assigné</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ installation.technicien.nom if installation.technicien else '-' }}</dd>
+              </div>
+              <div class="sm:col-span-2">
+                <dt class="text-sm font-medium text-gray-500">Date d'installation</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ installation.date_installation.strftime('%d/%m/%Y à %H:%M') if installation.date_installation else '-' }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Commentaire -->
+        {% if installation.commentaire %}
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-4 py-5 sm:p-6 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Notes</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <p class="text-gray-700">{{ installation.commentaire }}</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-6">
+        <!-- Quick Info -->
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-4 py-5 sm:p-6 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Informations</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dl class="space-y-4">
+              <div>
+                <dt class="text-sm font-medium text-gray-500">ID Installation</dt>
+                <dd class="mt-1 text-sm font-mono text-gray-900">{{ installation.id }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Type</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ installation.type_installation|default('-') }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Statut Actuel</dt>
+                <dd class="mt-1">
+                  <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {% if installation.statut == 'EN_ATTENTE' %}bg-yellow-100 text-yellow-800{% elif installation.statut == 'EN_COURS' %}bg-blue-100 text-blue-800{% elif installation.statut == 'TERMINEES' %}bg-green-100 text-green-800{% endif %}">
+                    {{ installation.statut }}
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
